@@ -67,7 +67,7 @@ def main():
             detected_objects = [model.names[int(box.cls)] for box in results[0].boxes]
             
             if any(obj in TARGET_OBJECTS for obj in detected_objects):
-                print("Object of interest detected! Recording video and audio...")
+                print("Object of interest detected! Recording video...")
 
                 # Switch to the video configuration
                 picam2.switch_mode(video_config)
