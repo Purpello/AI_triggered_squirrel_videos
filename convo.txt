@@ -1,0 +1,74 @@
+﻿Conversation with Gemini about how to code things on Raspberry Pi 5.
+======================================================================
+
+I’m just going to show my side of the conversation.  Try each of these prompts and see if it helps you.  One of the things to note is
+that Gemini is very good at helping you debug things.  Just paste in error messages and it can usually help you resolve the issue.
+
+My questions to Gemini
+----------------------
+- I have a raspberry pi 5 and a new model 3 camera. I need to test that I have the camera physically connected properly and I would like
+to do that by either taking a still image or streaming live video. Can you help me?
+
+- I'm getting libcamera not found. Should I install it?
+
+- When I did rpicam-still -o test.jpg I got that there is no rpi camera detected. Perhaps I have the physical connections wrong.
+Or should I boot/reboot with the camera plugged in?
+
+- Ok, I got it working, thanks to your help!
+
+- Ok, I would like your help writing a python program using my new camera. I had an old Model 1 camera that I had deployed outside
+that was taking pictures every 10 seconds in hopes of capturing a squirrel eating some nuts I put out for it.
+It saved the image with a timestamp in the name. I would like to recreate that with my new camera with some possible upgrades, if possible.
+The upgrades would be in the area of only capturing or saving a picture if an object is detected fairly close to the camera (say a meter).
+Not sure if that's possible though.
+
+- I like your overall plan! Let's remove the '1 meter' requirement to reduce complexity. We'll trust the AI to detect an object,
+regardless of distance. Also, I do have YOLO installed on my pi already. It is in its own virtual environment, so maybe I should run
+this new script in that virtual environment? Maybe I don't need to do anything additional with TensorFlow Lite. I don't have a separate
+AI hat, but, I did run a YOLO prediction on their apples-and-oranges image and it ran fairly easily with the following stats:
+Speed: 3.6ms preprocess, 226.4ms inference, 2.2ms postprocess per image. So, not sure how we need to adjust for my "horsepower" limitations.
+Let's generate the code based on these updated requirements. In test mode on my desk, I'll probably detect "Person" with the live stream,
+then for squirrels, I'll probably want to detect 'bear OR cat' because that is how YOLO categorizes squirrels off-the-shelf
+(based on some earlier experimentation I did). Later, I might train a YOLO model to detect squirrels. Totally optional, but it would be
+interesting if I could remotely monitor the livestream from another computer. Finally, I'm on my raspberry pi 5 now and the option to
+generate code with Canvas doesn't seem to work well with this browser, so perhaps we just generate the code into this conversation. Thanks!!
+
+- I'm getting the error ModuleNotFoundError: No module named 'picamera2'
+
+- Ok, I recreated the virtual environment and installed things as you suggested. Now I'm getting ValueError: numpy.dtype size changed,
+may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject. I also get this if I try the following from the
+command line: python3 -c "import picamera2"
+
+- hooray! That fixed the issue we were having. But, now when I run squirrel_cam I'm getting NameError: name 'socket' is not
+defined referring to the print(f"Live stream available at http://{socket.gethostbyname(socket.gethostname())}:{STREAM_PORT}")code
+
+- Ok, it ran. I think I need to comment out the live stream web feed. It only takes 1 image, when I hit ctrl-c and it doesn't
+show anything on the live feed until I hit ctrl-c. Or, instead of commenting it out, maybe you could re-present the code without the live feed?
+
+- It is running. One time it said "Object of interest captured" but there wasn't an image in the folder 'squirrel_captures'. Also, I tried
+moving in and out of the frame and would expect a few pictures of me, but there weren't any. Any ideas?
+
+- when I run as sudo it now complains about 'import cv2'
+
+- Still having trouble. I went back to just running it as python3 squirrel_cam.py. i put debug statements in the code as follows:
+
+                    # Capture a high-resolution still image
+                    picam2.stop()
+                    print("CAM STOPPED")
+                    still_config = picam2.create_still_configuration()
+                    print("CREATE STILL CONFIG")
+                    picam2.configure(still_config)
+                    print("INITIATE CONFIG")
+                    still_image = picam2.capture_array()
+                    print("GET STILL IMAGE")
+
+
+
+All of these print statements are printing EXCEPT the last one. So it seems that maybe the command still_image = picam2.capture_array() isn't working.
+What do you think?
+
+- regarding with Picamera2() as picam2_still:, it says RuntimeError: Failed to acquire camera: Device or resource busy.
+i wonder if we just need to slow down? Like, give things more time to start up and shutdown? Putting in pauses of 1 or more seconds?
+Maybe my hardware just isn't fast enough?
+
+- That worked!!! THank you!!!
